@@ -2,63 +2,49 @@
 <html lang="uk">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WeatherNow</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WeatherNow Chat</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-    <header>
-        <h1>WeatherNow</h1>
-        <nav>
-            <button onclick="toggleTheme()">Змінити тему</button>
-        </nav>
-    </header>
-    <main>
-        <!-- Секція пошуку -->
-        <section class="search-section">
-            <input type="text" id="city" placeholder="Введіть місто..." list="citySuggestions">
-            <datalist id="citySuggestions"></datalist>
-            <select id="unit">
-                <option value="metric">°C</option>
-                <option value="imperial">°F</option>
-            </select>
-            <button onclick="getWeatherByCity()">Пошук</button>
-            <button onclick="getWeatherByLocation()">Моя локація</button>
-        </section>
-
-        <!-- Секція відображення погоди -->
-        <section class="weather-section">
-            <div id="weather"></div>
-            <div id="forecast"></div>
-            <div class="charts">
-                <canvas id="hourlyChart"></canvas>
-                <canvas id="trendsChart"></canvas>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>WeatherNow</h2>
             </div>
-            <div id="map"></div>
-        </section>
+            <button class="new-query" onclick="clearChat()">Нове запитання</button>
+            <button class="toggle-theme" onclick="toggleTheme()">Змінити тему</button>
+            <div class="history">
+                <h3>Історія запитів</h3>
+            </div>
+        </aside>
 
-        <!-- Секція налаштувань -->
-        <section class="settings-section">
-            <h2>Налаштування</h2>
-            <form id="customSettings">
-                <label>
-                    <input type="checkbox" id="showUV" checked> Показувати UV-індекс
-                </label>
-                <label>
-                    <input type="checkbox" id="showSun" checked> Показувати час сходу/заходу
-                </label>
-                <label>
-                    <input type="checkbox" id="showFeelsLike" checked> Показувати "відчувається як"
-                </label>
-                <button type="button" onclick="saveCustomSettings()">Зберегти</button>
-            </form>
-        </section>
-    </main>
+        <main class="chat-area">
+            <div class="chat-messages" id="chatMessages">
+                <div id="weather"></div>
+                <div id="forecast"></div>
+                <div class="charts">
+                    <canvas id="hourlyChart"></canvas>
+                    <canvas id="trendsChart"></canvas>
+                </div>
+                <div id="map"></div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="city" placeholder="Введіть місто..." list="citySuggestions" />
+                <datalist id="citySuggestions"></datalist>
+                <select id="unit">
+                    <option value="metric">°C</option>
+                    <option value="imperial">°F</option>
+                </select>
+                <button onclick="getWeatherByCity()">Пошук</button>
+                <button onclick="getWeatherByLocation()">Моя локація</button>
+            </div>
+        </main>
+    </div>
 
-    <!-- Підключення скриптів -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>

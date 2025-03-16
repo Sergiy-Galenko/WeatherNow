@@ -1,5 +1,6 @@
 const apiKey = "5c4831ef7cf243d23acff9ed8118baca";
 let map, marker, hourlyChart, trendsChart;
+
 let customSettings = {
     showUV: true,
     showSun: true,
@@ -10,16 +11,53 @@ function toggleTheme() {
     document.body.classList.toggle("dark-theme");
 }
 
-function saveCustomSettings() {
-    customSettings.showUV = document.getElementById("showUV").checked;
-    customSettings.showSun = document.getElementById("showSun").checked;
-    customSettings.showFeelsLike =
-        document.getElementById("showFeelsLike").checked;
-    alert("Налаштування збережено!");
+function clearChat() {
+    if (map) {
+        map.remove();
+        map = null;
+        marker = null;
+    }
+    const chatMessages = document.getElementById("chatMessages");
+    chatMessages.innerHTML = `
+    <div id="weather"></div>
+    <div id="forecast"></div>
+    <div class="charts">
+      <canvas id="hourlyChart"></canvas>
+      <canvas id="trendsChart"></canvas>
+    </div>
+    <div id="map"></div>
+  `;
+    document.getElementById("city").value = "";
+}
+
+function updateHistory(cityName) {
+    const historyDiv = document.querySelector(".history");
+    const entry = document.createElement("div");
+    entry.className = "history-entry";
+
+    const citySpan = document.createElement("span");
+    citySpan.textContent = cityName;
+    citySpan.style.cursor = "pointer";
+    citySpan.onclick = () => {
+        document.getElementById("city").value = cityName;
+        getWeatherByCity();
+    };
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Видалити";
+    deleteBtn.className = "delete-btn";
+    deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+        historyDiv.removeChild(entry);
+    };
+
+    entry.appendChild(citySpan);
+    entry.appendChild(deleteBtn);
+    historyDiv.appendChild(entry);
 }
 
 function getWeatherByCity() {
-    const city = document.getElementById("city").value;
+    const city = document.getElementById("city").value.trim();
     const unit = document.getElementById("unit").value;
     if (!city) {
         alert("Будь ласка, введіть назву міста.");
@@ -37,6 +75,7 @@ function getWeatherByCity() {
             displayWeather(data, unit);
             updateMap(data.coord.lat, data.coord.lon, data, unit);
             getForecast(city, unit);
+            updateHistory(data.name);
         })
         .catch((err) => {
             console.error(err);
@@ -63,6 +102,7 @@ function getWeatherByLocation() {
                         displayWeather(data, unit);
                         updateMap(lat, lon, data, unit);
                         getForecastByCoords(lat, lon, unit);
+                        updateHistory(data.name);
                     })
                     .catch((err) => {
                         console.error(err);
@@ -82,15 +122,17 @@ function displayWeather(data, unit) {
     const unitSymbol = unit === "metric" ? "°C" : "°F";
     const iconUrl = `http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
     const weatherDiv = document.getElementById("weather");
-    weatherDiv.innerHTML = `
-    <div class="weather-card">
-      <h2>${data.name}</h2>
-      <img src="${iconUrl}" alt="${data.weather[0].description}">
-      <p><strong>Температура:</strong> ${data.main.temp}${unitSymbol}</p>
-      <p><strong>Вологість:</strong> ${data.main.humidity}%</p>
-      <p><strong>Опис:</strong> ${data.weather[0].description}</p>
-    </div>
-  `;
+    if (weatherDiv) {
+        weatherDiv.innerHTML = `
+      <div class="weather-card">
+        <h2>${data.name}</h2>
+        <img src="${iconUrl}" alt="${data.weather[0].description}">
+        <p><strong>Температура:</strong> ${data.main.temp}${unitSymbol}</p>
+        <p><strong>Вологість:</strong> ${data.main.humidity}%</p>
+        <p><strong>Опис:</strong> ${data.weather[0].description}</p>
+      </div>
+    `;
+    }
 }
 
 function updateMap(lat, lon, data, unit) {
@@ -178,7 +220,9 @@ function displayForecast(forecastData, unitSymbol) {
       </div>
     `;
     }
-    forecastDiv.innerHTML = forecastHTML;
+    if (forecastDiv) {
+        forecastDiv.innerHTML = forecastHTML;
+    }
 }
 
 function drawHourlyChart(forecastData, unitSymbol) {
