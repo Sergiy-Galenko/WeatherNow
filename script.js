@@ -7,6 +7,27 @@ let customSettings = {
     showFeelsLike: true,
 };
 
+const weatherTips = [
+  "Чи знали ви? Веселка завжди з'являється навпроти сонця!",
+  "Порада: Влітку носіть світлий одяг — він менше нагрівається на сонці.",
+  "Факт: Найвища температура, коли-небудь зафіксована на Землі, становила 56,7°C (Долина Смерті, США).",
+  "Порада: Після дощу повітря стає чистішим завдяки осіданню пилу та алергенів.",
+  "Факт: Сніжинки завжди мають шість граней, але жодна не повторюється!",
+  "Порада: Взимку уникайте переохолодження — вдягайте кілька шарів одягу.",
+  "Факт: Грім завжди слідує за блискавкою, бо світло рухається швидше за звук.",
+  "Порада: Вологість повітря впливає на відчуття спеки — чим вона вища, тим спекотніше здається.",
+  "Факт: Найбільше опадів випадає у Черапунджі (Індія).",
+  "Порада: Не забувайте користуватися сонцезахисним кремом навіть у хмарну погоду!"
+];
+
+function showRandomWeatherTip() {
+  const tipDiv = document.getElementById("weather-tip");
+  if (tipDiv) {
+    const randomIndex = Math.floor(Math.random() * weatherTips.length);
+    tipDiv.textContent = weatherTips[randomIndex];
+  }
+}
+
 function toggleTheme() {
     document.body.classList.toggle("dark-theme");
 }
@@ -28,6 +49,7 @@ function clearChat() {
     <div id="map"></div>
   `;
     document.getElementById("city").value = "";
+    showRandomWeatherTip(); // Оновлюю пораду при очищенні
 }
 
 function updateHistory(cityName) {
@@ -76,6 +98,7 @@ function getWeatherByCity() {
             updateMap(data.coord.lat, data.coord.lon, data, unit);
             getForecast(city, unit);
             updateHistory(data.name);
+            showRandomWeatherTip(); // Додаю оновлення поради
         })
         .catch((err) => {
             console.error(err);
@@ -103,6 +126,7 @@ function getWeatherByLocation() {
                         updateMap(lat, lon, data, unit);
                         getForecastByCoords(lat, lon, unit);
                         updateHistory(data.name);
+                        showRandomWeatherTip(); // Додаю оновлення поради
                     })
                     .catch((err) => {
                         console.error(err);
@@ -123,13 +147,30 @@ function displayWeather(data, unit) {
     const iconUrl = `http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
     const weatherDiv = document.getElementById("weather");
     if (weatherDiv) {
+        // Форматування часу сходу/заходу сонця
+        function formatTime(unix, tz) {
+            const date = new Date((unix + data.timezone) * 1000);
+            return date.toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit" });
+        }
         weatherDiv.innerHTML = `
       <div class="weather-card">
-        <h2>${data.name}</h2>
-        <img src="${iconUrl}" alt="${data.weather[0].description}">
-        <p><strong>Температура:</strong> ${data.main.temp}${unitSymbol}</p>
-        <p><strong>Вологість:</strong> ${data.main.humidity}%</p>
-        <p><strong>Опис:</strong> ${data.weather[0].description}</p>
+        <div class="weather-header">
+          <img src="${iconUrl}" alt="${data.weather[0].description}" class="weather-main-icon">
+          <div class="weather-main-info">
+            <h2>${data.name}</h2>
+            <div class="weather-desc">${data.weather[0].description.charAt(0).toUpperCase() + data.weather[0].description.slice(1)}</div>
+            <div class="weather-temp">${data.main.temp}${unitSymbol}</div>
+          </div>
+        </div>
+        <div class="weather-details">
+          <div><strong>Відчувається як:</strong> ${data.main.feels_like}${unitSymbol}</div>
+          <div><strong>Мін/Макс:</strong> ${data.main.temp_min}${unitSymbol} / ${data.main.temp_max}${unitSymbol}</div>
+          <div><strong>Вологість:</strong> ${data.main.humidity}%</div>
+          <div><strong>Тиск:</strong> ${data.main.pressure} гПа</div>
+          <div><strong>Вітер:</strong> ${data.wind.speed} м/с</div>
+          <div><strong>Схід сонця:</strong> ${formatTime(data.sys.sunrise, data.timezone)}</div>
+          <div><strong>Захід сонця:</strong> ${formatTime(data.sys.sunset, data.timezone)}</div>
+        </div>
       </div>
     `;
     }
@@ -299,3 +340,6 @@ function drawTrendsChart(forecastData, unitSymbol) {
         },
     });
 }
+
+// Показати пораду при завантаженні сторінки
+window.addEventListener("DOMContentLoaded", showRandomWeatherTip);

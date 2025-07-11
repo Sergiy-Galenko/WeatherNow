@@ -2,11 +2,12 @@
 <html lang="uk">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WeatherNow Chat</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeatherNow — Погода онлайн, прогноз та карта</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%E2%98%80%EF%B8%8F%3C/text%3E%3C/svg%3E">
 </head>
 
 <body>
@@ -31,6 +32,7 @@
                     <canvas id="trendsChart"></canvas>
                 </div>
                 <div id="map"></div>
+                <div id="weather-tip" class="weather-tip"></div>
             </div>
             <div class="chat-input">
                 <input type="text" id="city" placeholder="Введіть місто..." list="citySuggestions" />
